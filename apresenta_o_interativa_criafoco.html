@@ -1,0 +1,2411 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CriaFoco — Isaías Eufrosino Rodrigues | Apresentação Interativa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              dark: '#050814',
+              navy: '#0a1128',
+              cyan: '#00f0ff',
+              blue: '#3b82f6',
+              violet: '#7c3aed',
+              amber: '#f59e0b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #050814;
+      color: #f8fafc;
+    }
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .ambient-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 45%, rgba(10, 17, 40, 0.35) 0%, rgba(5, 8, 20, 0.85) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .glass-panel {
+      background: rgba(13, 21, 46, 0.55);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+    .glass-card {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+    .glass-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 240, 255, 0.45);
+      box-shadow: 0 12px 32px rgba(0, 240, 255, 0.15);
+    }
+    .text-gradient-cyan {
+      background: linear-gradient(135deg, #ffffff 0%, #7dd3fc 45%, #00f0ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .text-gradient-gold {
+      background: linear-gradient(135deg, #fef08a 0%, #f59e0b 55%, #ea580c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .text-gradient-violet {
+      background: linear-gradient(135deg, #e0e7ff 0%, #a78bfa 50%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Stagger Slide Animations */
+    @keyframes fadeUpIn {
+      0% {
+        opacity: 0;
+        transform: translateY(26px) scale(0.98);
+        filter: blur(4px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+    .animate-stagger {
+      opacity: 0;
+      animation: fadeUpIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .delay-1 { animation-delay: 0.08s; }
+    .delay-2 { animation-delay: 0.18s; }
+    .delay-3 { animation-delay: 0.28s; }
+    .delay-4 { animation-delay: 0.38s; }
+    .delay-5 { animation-delay: 0.48s; }
+
+    /* Custom Scrollbar for mobile overflow safety */
+    .slide-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .slide-scroll::-webkit-scrollbar-thumb {
+      background: rgba(0, 240, 255, 0.3);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-cyan-500 selection:text-slate-950">
+
+  <!-- Animated Background Canvas -->
+  <canvas id="bg-canvas"></canvas>
+  <div class="ambient-overlay"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-8 py-4 pointer-events-none">
+    <!-- Brand Mark with Magnifying Glass (Lupa) -->
+    <div onclick="goToSlide(0)" class="flex items-center gap-3 pointer-events-auto cursor-pointer group">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/25 group-hover:scale-105 transition-transform">
+        <svg class="w-5 h-5 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.6">
+          <circle cx="10.5" cy="10.5" r="6.5" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.5 15.5L21 21" />
+        </svg>
+      </div>
+      <div>
+        <span class="font-display font-bold tracking-wider text-sm sm:text-base text-white">CRIA<span class="text-cyan-400">FOCO</span></span>
+        <span class="hidden md:inline-block text-xs text-slate-400 ml-2 border-l border-slate-700 pl-2">Isaías Eufrosino Rodrigues</span>
+      </div>
+    </div>
+
+    <!-- Language Switcher & Controls -->
+    <div class="flex items-center gap-2 sm:gap-3 pointer-events-auto">
+      <!-- Language Pill -->
+      <div class="glass-panel rounded-full p-1 flex items-center gap-1" role="group" aria-label="Language selector">
+        <button onclick="setLanguage('pt')" id="lang-pt" class="lang-btn px-3 py-1 rounded-full text-xs font-bold tracking-wide transition-all bg-cyan-400 text-slate-950 shadow-sm">PT</button>
+        <button onclick="setLanguage('en')" id="lang-en" class="lang-btn px-3 py-1 rounded-full text-xs font-bold tracking-wide transition-all text-slate-300 hover:text-white">EN</button>
+        <button onclick="setLanguage('es')" id="lang-es" class="lang-btn px-3 py-1 rounded-full text-xs font-bold tracking-wide transition-all text-slate-300 hover:text-white">ES</button>
+      </div>
+
+      <!-- Slide Index Overview Button -->
+      <button onclick="toggleOverview()" title="Visão Geral / Slides" class="glass-panel hover:border-cyan-400/50 text-slate-200 hover:text-cyan-300 p-2.5 rounded-full transition-all">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>
+      </button>
+
+      <!-- Fullscreen Toggle Button -->
+      <button onclick="toggleFullscreen()" title="Tela Cheia / Fullscreen" class="glass-panel hover:border-cyan-400/50 text-slate-200 hover:text-cyan-300 p-2.5 rounded-full transition-all">
+        <svg id="fs-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Stage Container -->
+  <main id="stage" class="relative z-10 w-full h-full flex items-center justify-center px-4 sm:px-12 md:px-20 pt-16 pb-20">
+    <!-- Dynamic Slide Content Injected Here -->
+  </main>
+
+  <!-- Side Navigation Arrows (Desktop & Tablet) -->
+  <button onclick="prevSlide()" id="btn-prev" aria-label="Slide anterior" class="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 glass-panel hover:border-cyan-400/60 text-slate-300 hover:text-cyan-300 p-3 sm:p-3.5 rounded-full transition-all opacity-75 hover:opacity-100 disabled:opacity-20 disabled:pointer-events-none">
+    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+    </svg>
+  </button>
+
+  <button onclick="nextSlide()" id="btn-next" aria-label="Próximo slide" class="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 glass-panel hover:border-cyan-400/60 text-slate-300 hover:text-cyan-300 p-3 sm:p-3.5 rounded-full transition-all opacity-75 hover:opacity-100 disabled:opacity-20 disabled:pointer-events-none">
+    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
+
+  <!-- Bottom Progress Bar & Slide Indicator -->
+  <footer class="fixed bottom-0 left-0 right-0 z-30 px-4 sm:px-8 py-4 flex flex-col gap-2 pointer-events-none">
+    <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+      <span id="slide-category" class="uppercase tracking-widest text-cyan-400/90 font-semibold">CRIAFOCO</span>
+      <div class="flex items-center gap-4 pointer-events-auto">
+        <span class="hidden sm:inline text-slate-500" id="nav-hint">Use ← → ou Espaço para navegar</span>
+        <span id="slide-counter" class="font-display font-bold text-slate-200 bg-slate-900/70 px-3 py-1 rounded-full border border-white/10">01 / 22</span>
+      </div>
+    </div>
+    <div class="w-full h-1.5 bg-slate-800/80 rounded-full overflow-hidden backdrop-blur-sm">
+      <div id="progress-bar" class="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500 transition-all duration-500 ease-out rounded-full" style="width: 4.54%"></div>
+    </div>
+  </footer>
+
+  <!-- Slide Grid Overview Modal -->
+  <div id="overview-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl hidden flex-col p-6 sm:p-10 overflow-y-auto">
+    <div class="max-w-6xl w-full mx-auto flex items-center justify-between mb-8">
+      <div>
+        <h2 id="overview-title" class="font-display text-2xl font-bold text-white">Mapa da Apresentação</h2>
+        <p id="overview-subtitle" class="text-sm text-slate-400">Clique em qualquer slide para ir diretamente até ele</p>
+      </div>
+      <button onclick="toggleOverview()" class="glass-panel hover:border-cyan-400 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
+        <span>Fechar</span>
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="overview-grid" class="max-w-6xl w-full mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-10">
+      <!-- Thumbnails generated via JS -->
+    </div>
+  </div>
+
+  <!-- Toast Notification (for Copy actions - zero alert() usage) -->
+  <div id="toast" class="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 glass-panel border-cyan-400/50 text-cyan-200 px-5 py-2.5 rounded-full text-sm font-medium shadow-2xl opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2">
+    <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+    <span id="toast-msg">Copiado!</span>
+  </div>
+
+  <script>
+    // Reusable Lupa SVG Helper
+    const lupaIconSVG = (cls = "w-7 h-7") => `
+      <svg class="${cls}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4">
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.5 15.5L21 21" />
+      </svg>
+    `;
+
+    // =========================================================================
+    // 1. MULTILINGUAL CONTENT REPOSITORY — 22 SLIDES (PT | EN | ES)
+    // =========================================================================
+    const translations = {
+      pt: {
+        ui: {
+          hint: "Use ← → ou Espaço para navegar",
+          overviewTitle: "Mapa da Apresentação (25 Slides)",
+          overviewSub: "Clique em qualquer slide para saltar diretamente",
+          copiedEmail: "E-mail copiado para a área de transferência!",
+          copiedPhone: "Telefone/WhatsApp copiado!"
+        },
+        slides: [
+          // 01: Capa Oficial
+          {
+            category: "01 • Abertura",
+            title: "CriaFoco — Isaías Eufrosino Rodrigues",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 inline-flex items-center gap-3 px-5 py-2 rounded-full glass-panel border-cyan-400/35 text-cyan-300 text-xs sm:text-sm font-bold tracking-[0.2em] uppercase mb-6">
+                  ${lupaIconSVG("w-4 h-4 text-cyan-400")}
+                  <span>WWW.CRIAFOCO.COM.BR</span>
+                </div>
+                <div class="animate-stagger delay-2 flex items-center justify-center gap-4 mb-4">
+                  <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-slate-950 shadow-xl shadow-cyan-500/25">
+                    ${lupaIconSVG("w-8 h-8 sm:w-9 sm:h-9")}
+                  </div>
+                  <h1 class="font-display text-5xl sm:text-7xl md:text-8xl font-black tracking-tight text-white">
+                    CRIA<span class="text-gradient-cyan">FOCO</span>
+                  </h1>
+                </div>
+                <p class="animate-stagger delay-3 text-base sm:text-xl text-slate-300 font-light max-w-2xl mb-9">
+                  Criatividade estruturada, clareza estratégica e foco na realização.
+                </p>
+                <div class="animate-stagger delay-4 glass-panel px-6 py-4 rounded-2xl flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                  <div class="text-center sm:text-left">
+                    <p class="text-[11px] uppercase tracking-widest text-cyan-400 font-bold">Palestrante & Consultor</p>
+                    <p class="text-base sm:text-lg font-extrabold text-white">ISAÍAS EUFROSINO RODRIGUES</p>
+                  </div>
+                  <div class="hidden sm:block w-px h-8 bg-white/15"></div>
+                  <button onclick="nextSlide()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-600 text-slate-950 font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-cyan-500/25 flex items-center gap-2 cursor-pointer">
+                    <span>Iniciar Apresentação</span>
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                  </button>
+                </div>
+              </div>
+            `
+          },
+          // 02: Sonhar & Imaginação
+          {
+            category: "02 • Visão & Imaginação",
+            title: "Se Você Pode Sonhar, Você Pode Fazer",
+            render: () => `
+              <div class="max-w-5xl w-full flex flex-col gap-7 items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-cyan-400/25 relative overflow-hidden">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold block mb-3">Ponto de Partida</span>
+                  <h2 class="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight">
+                    “SE VOCÊ PODE <span class="text-gradient-cyan">SONHAR</span>,<br/>VOCÊ PODE <span class="text-gradient-gold">FAZER</span>.”
+                  </h2>
+                </div>
+
+                <div class="animate-stagger delay-2 glass-card p-6 sm:p-8 rounded-2xl max-w-3xl w-full flex flex-col sm:flex-row items-center gap-5 text-left">
+                  <div class="w-12 h-12 rounded-xl bg-violet-500/20 border border-violet-400/30 flex items-center justify-center shrink-0 text-violet-300 font-display text-3xl font-bold">“</div>
+                  <div>
+                    <p class="text-lg sm:text-2xl font-medium text-slate-100 italic leading-relaxed">
+                      “A IMAGINAÇÃO É MAIS IMPORTANTE QUE O CONHECIMENTO.”
+                    </p>
+                    <p class="text-xs sm:text-sm font-bold text-cyan-400 mt-2 tracking-wider uppercase">— Albert Einstein</p>
+                  </div>
+                </div>
+              </div>
+            `
+          },
+          // 03: Historiando (4 - 9 - 12 - 20 - 30 - 60 - 70)
+          {
+            category: "03 • Historiando",
+            title: "Historiando: 4 - 9 - 12 - 20 - 30 - 60 - 70",
+            render: () => {
+              const milestones = [
+                { age: "4", stage: "Infância", note: "Descoberta do mundo" },
+                { age: "9", stage: "Curiosidade", note: "Primeiros porquês" },
+                { age: "12", stage: "Identidade", note: "Transição e sonhos" },
+                { age: "20", stage: "Expansão", note: "Escolhas e energia" },
+                { age: "30", stage: "Construção", note: "Carreira e propósito" },
+                { age: "60", stage: "Maturidade", note: "Síntese e sabedoria" },
+                { age: "70", stage: "Plenitude", note: "Legado e história" }
+              ];
+              return `
+                <div class="max-w-6xl w-full flex flex-col items-center text-center gap-7">
+                  <div class="animate-stagger delay-1">
+                    <span class="text-xs uppercase tracking-[0.3em] text-cyan-400 font-bold">Linha do Tempo</span>
+                    <h2 class="font-display text-4xl sm:text-6xl font-black text-white mt-1">HISTORIANDO</h2>
+                  </div>
+
+                  <div class="animate-stagger delay-2 w-full relative py-4">
+                    <div class="hidden lg:block absolute top-1/2 left-8 right-8 h-0.5 bg-gradient-to-r from-cyan-500/20 via-cyan-400 to-amber-400/40 -translate-y-1/2"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4 relative z-10">
+                      ${milestones.map((m, idx) => `
+                        <div class="glass-card rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center ${idx === 4 ? 'border-cyan-400/60 bg-cyan-500/10' : ''}">
+                          <span class="font-display text-3xl sm:text-4xl font-black text-gradient-cyan">${m.age}</span>
+                          <span class="text-xs font-bold uppercase tracking-wider text-white mt-2">${m.stage}</span>
+                          <span class="text-[11px] text-slate-400 mt-1">${m.note}</span>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+          },
+          // 04: Dr. Shigeaki
+          {
+            category: "04 • Propósito de Vida",
+            title: "Nenhuma Apresentação Pode Ser Melhor Que Sua Vida",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-14 rounded-3xl border-amber-400/30 relative overflow-hidden">
+                  <span class="text-xs uppercase tracking-[0.25em] text-amber-300 font-bold block mb-5">Reflexão Essencial</span>
+                  <blockquote class="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                    “Nenhuma apresentação de suas capacidades profissionais pode ser melhor que sua <span class="text-gradient-gold">VIDA</span>.”
+                  </blockquote>
+                  <p class="text-sm sm:text-base font-bold text-cyan-400 uppercase tracking-[0.2em] mt-7">— Dr. Shigeaki Hinohara</p>
+                </div>
+              </div>
+            `
+          },
+          // 05: Processo Criativo — Visão Geral
+          {
+            category: "05 • Processo Criativo",
+            title: "Processo Criativo — As 5 Etapas",
+            render: () => {
+              const steps = [
+                { num: "01", title: "INQUIETAÇÃO", sub: "Dqm" },
+                { num: "02", title: "PREPARAÇÃO", sub: "Imersão" },
+                { num: "03", title: "INCUBAÇÃO", sub: "Maturação" },
+                { num: "04", title: "ILUMINAÇÃO", sub: "Insight" },
+                { num: "05", title: "VERIFICAÇÃO", sub: "Validação" }
+              ];
+              return `
+                <div class="max-w-6xl w-full flex flex-col items-center text-center gap-8">
+                  <div class="animate-stagger delay-1">
+                    <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Jornada da Criação</span>
+                    <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-1">PROCESSO CRIATIVO</h2>
+                  </div>
+
+                  <div class="animate-stagger delay-2 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 w-full">
+                    ${steps.map((s, idx) => `
+                      <button onclick="goToSlide(${5 + idx})" class="glass-card p-6 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer group">
+                        <span class="font-display text-3xl font-black text-cyan-400 group-hover:scale-110 transition-transform">${s.num}</span>
+                        <h3 class="font-display text-lg font-extrabold text-white mt-3 tracking-wide">${s.title}</h3>
+                        <span class="text-xs text-slate-400 mt-1">${s.sub}</span>
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }
+          },
+          // 06: Processo Criativo — Etapa 1: INQUIETAÇÃO (Dqm)
+          {
+            category: "06 • Processo Criativo (1/5)",
+            title: "Inquietação — Dqm",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-cyan-400/35">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Etapa 01 de 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-gradient-cyan mb-4">INQUIETAÇÃO</h2>
+                  <div class="inline-block px-5 py-2 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-300 font-display text-xl sm:text-2xl font-extrabold tracking-wider mb-6">
+                    Dqm
+                  </div>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    O ponto de ignição criativa: o incômodo construtivo que desafia o status quo, desperta a curiosidade e formula as perguntas certas.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          // 07: Processo Criativo — Etapa 2: PREPARAÇÃO
+          {
+            category: "07 • Processo Criativo (2/5)",
+            title: "Preparação",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-blue-400/35">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Etapa 02 de 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-6">PREPARAÇÃO</h2>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Imersão profunda no problema: coleta de informações, pesquisa, observação ativa e ampliação de repertório técnico e humano.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          // 08: Processo Criativo — Etapa 3: INCUBAÇÃO
+          {
+            category: "08 • Processo Criativo (3/5)",
+            title: "Incubação",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-violet-400/35">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-violet-500/15 border border-violet-400/30 text-violet-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Etapa 03 de 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-gradient-violet mb-6">INCUBAÇÃO</h2>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    O tempo de maturação silenciosa: quando a mente conecta referências aparentemente distantes nos bastidores do subconsciente.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          // 09: Processo Criativo — Etapa 4: ILUMINAÇÃO
+          {
+            category: "09 • Processo Criativo (4/5)",
+            title: "Iluminação",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-amber-400/40">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-500/15 border border-amber-400/35 text-amber-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Etapa 04 de 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-gradient-gold mb-6">ILUMINAÇÃO</h2>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    O instante de clareza e síntese — o momento “Eureka” em que a solução emerge com nitidez e direção.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          // 10: Processo Criativo — Etapa 5: VERIFICAÇÃO
+          {
+            category: "10 • Processo Criativo (5/5)",
+            title: "Verificação",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-emerald-400/35">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Etapa 05 de 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-6">VERIFICAÇÃO</h2>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    A prova da realidade: testar, lapidar, validar na prática e transformar o insight em resultado concreto.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          // 11: Cubo de Estímulos
+          {
+            category: "11 • Ferramenta de Ideação",
+            title: "Cubo de Estímulos",
+            render: () => `
+              <div class="max-w-5xl w-full flex flex-col items-center gap-7">
+                <div class="text-center animate-stagger delay-1">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Matriz Tridimensional</span>
+                  <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-1">CUBO DE ESTÍMULOS</h2>
+                </div>
+
+                <div class="animate-stagger delay-2 grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+                  <div class="glass-card p-6 sm:p-7 rounded-3xl border-t-4 border-t-cyan-400 text-center">
+                    <span class="text-xs font-bold uppercase tracking-widest text-cyan-400">Eixo 01</span>
+                    <h3 class="font-display text-2xl font-extrabold text-white mt-2 mb-3">Sentimentos</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">Percepções humanas, empatia, dores e desejos que geram conexão genuína.</p>
+                  </div>
+
+                  <div class="glass-card p-6 sm:p-7 rounded-3xl border-t-4 border-t-violet-400 text-center">
+                    <span class="text-xs font-bold uppercase tracking-widest text-violet-400">Eixo 02</span>
+                    <h3 class="font-display text-2xl font-extrabold text-white mt-2 mb-3">Palcos Operacionais</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">Ambientes, contextos e canais reais onde as interações acontecem.</p>
+                  </div>
+
+                  <div class="glass-card p-6 sm:p-7 rounded-3xl border-t-4 border-t-amber-400 text-center">
+                    <span class="text-xs font-bold uppercase tracking-widest text-amber-400">Eixo 03</span>
+                    <h3 class="font-display text-2xl font-extrabold text-white mt-2 mb-3">5W2H</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">Estrutura objetiva de execução: O quê, Por quê, Onde, Quando, Quem, Como e Quanto.</p>
+                  </div>
+                </div>
+              </div>
+            `
+          },
+          // 12: Metodologia SCRIPT — Visão Geral
+          {
+            category: "12 • Metodologia SCRIPT",
+            title: "Metodologia SCRIPT — Visão Geral",
+            render: () => {
+              const letters = [
+                { l: "S", t: "Suporte", slideIdx: 12 },
+                { l: "C", t: "Cliente", slideIdx: 13 },
+                { l: "R", t: "Recursos", slideIdx: 14 },
+                { l: "I", t: "Investigação", slideIdx: 15 },
+                { l: "P", t: "Plano", slideIdx: 16 },
+                { l: "T", t: "Time", slideIdx: 17 }
+              ];
+              return `
+                <div class="max-w-5xl w-full flex flex-col items-center text-center gap-8">
+                  <div class="animate-stagger delay-1">
+                    <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Roteiro Estratégico</span>
+                    <h2 class="font-display text-4xl sm:text-6xl font-black text-gradient-cyan mt-1">SCRIPT</h2>
+                    <p class="text-sm sm:text-base text-slate-300 mt-2">Clique em uma letra para focar individualmente em cada pilar</p>
+                  </div>
+
+                  <div class="animate-stagger delay-2 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
+                    ${letters.map((item) => `
+                      <button onclick="goToSlide(${item.slideIdx})" class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center cursor-pointer group">
+                        <span class="font-display text-4xl font-black text-white group-hover:text-cyan-300 transition-colors">${item.l}</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 mt-2">${item.t}</span>
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }
+          },
+          // 13: SCRIPT — S de SUPORTE (Individual)
+          {
+            category: "13 • Metodologia SCRIPT (S)",
+            title: "S de Suporte",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-violet-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Voltar ao SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-violet-500/25">S</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-violet-300 font-bold block mb-2">Pilar 01 de 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">de SUPORTE</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Apoiadores e parceiros-chave que fortalecem e sustentam o projeto.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          // 14: SCRIPT — C de CLIENTE (Individual)
+          {
+            category: "14 • Metodologia SCRIPT (C)",
+            title: "C de Cliente",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-cyan-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Voltar ao SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-cyan-500/25">C</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-300 font-bold block mb-2">Pilar 02 de 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">de CLIENTE</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Valor, identificar Canais estratégicos e estabelecer Comunicação clara.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          // 15: SCRIPT — R de RECURSOS (Individual)
+          {
+            category: "15 • Metodologia SCRIPT (R)",
+            title: "R de Recursos",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-blue-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Voltar ao SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-blue-500/25">R</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-blue-300 font-bold block mb-2">Pilar 03 de 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">de RECURSOS</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Infraestrutura, fornecedores, fontes de captação e destinos de aplicação.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          // 16: SCRIPT — I de INVESTIGAÇÃO (Individual)
+          {
+            category: "16 • Metodologia SCRIPT (I)",
+            title: "I de Investigação",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-amber-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Voltar ao SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-amber-500/25">I</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-amber-300 font-bold block mb-2">Pilar 04 de 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">de INVESTIGAÇÃO</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Forças, Oportunidades, Fraquezas e Ameaças (Matriz SWOT).
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          // 17: SCRIPT — P de PLANO (Individual)
+          {
+            category: "17 • Metodologia SCRIPT (P)",
+            title: "P de Plano",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-emerald-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Voltar ao SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-emerald-500/25">P</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-emerald-300 font-bold block mb-2">Pilar 05 de 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">de PLANO</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Quem, quando, onde, como, o quê, por quê e pontos de controle (5W2H).
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          // 18: SCRIPT — T de TIME (Individual)
+          {
+            category: "18 • Metodologia SCRIPT (T)",
+            title: "T de Time",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-cyan-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Voltar ao SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-cyan-400 to-sky-500 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-cyan-500/25">T</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-300 font-bold block mb-2">Pilar 06 de 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">de TIME</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Construa uma visão de parceria, engajamento e propósito compartilhado.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          // 19: Steve Jobs — Foco é Dizer Não
+          {
+            category: "19 • A Essência do Foco",
+            title: "Foco Significa Dizer Não",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-9 sm:p-14 rounded-3xl border-cyan-400/35">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold block mb-4">Clareza de Escolha</span>
+                  <h2 class="font-display text-3xl sm:text-5xl md:text-6xl font-black text-white leading-tight">
+                    “FOCO SIGNIFICA DIZER <span class="text-gradient-gold">NÃO</span> A CENTENAS DE BOAS IDEIAS.”
+                  </h2>
+                  <p class="text-sm sm:text-base font-bold text-slate-300 uppercase tracking-[0.2em] mt-7">— Steve Jobs</p>
+                </div>
+              </div>
+            `
+          },
+          // 20: Infinitas Possibilidades vs Finita Capacidade
+          {
+            category: "20 • Por Que Focar?",
+            title: "Infinitas Possibilidades & Finita Realização",
+            render: () => `
+              <div class="max-w-5xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-14 rounded-3xl border-cyan-400/30">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold block mb-5">Fundamento Humano</span>
+                  <h2 class="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                    PRECISAMOS DE FOCO PORQUE SOMOS SERES COM <span class="text-gradient-cyan">INFINITAS POSSIBILIDADES DE ESCOLHA</span> E <span class="text-gradient-gold">FINITA CAPACIDADE DE REALIZAÇÃO</span>.
+                  </h2>
+                </div>
+              </div>
+            `
+          },
+          // 21: Viktor Frankl
+          {
+            category: "21 • Liberdade de Atitude",
+            title: "A Última das Liberdades Humanas",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl border-violet-400/30">
+                  <span class="text-xs uppercase tracking-[0.25em] text-violet-300 font-bold block mb-5">Autonomia Interior</span>
+                  <blockquote class="font-display text-xl sm:text-3xl md:text-4xl font-bold text-white leading-snug">
+                    “...Tudo pode ser tirado do homem, menos uma coisa: a última das liberdades humanas — <span class="text-gradient-cyan">escolher sua atitude</span> em qualquer circunstância...”
+                  </blockquote>
+                  <p class="text-sm sm:text-base font-bold text-amber-300 uppercase tracking-[0.2em] mt-7">— Viktor Frankl</p>
+                </div>
+              </div>
+            `
+          },
+          // 22: Pilares do Foco
+          {
+            category: "22 • Pilares do Foco",
+            title: "Os Pilares do Foco",
+            render: () => {
+              const pillars = [
+                {
+                  num: "01",
+                  title: "AMBIENTE",
+                  desc: "Espaço físico, digital e relacional desenhado para eliminar ruídos e favorecer a atenção plena."
+                },
+                {
+                  num: "02",
+                  title: "LÉMTITUDE",
+                  desc: "A união de lentidão consciente com altitude estratégica: pausar para enxergar o todo com clareza."
+                },
+                {
+                  num: "03",
+                  title: "INFORMAÇÃO MOBILIZADORA",
+                  desc: "Conhecimento seletivo que gera ação imediata e transformação, em vez de sobrecarga mental."
+                },
+                {
+                  num: "04",
+                  title: "VISÃO DE FUTURO",
+                  desc: "Direção clara de onde se quer chegar para guiar as prioridades e renúncias do hoje."
+                }
+              ];
+              return `
+                <div class="max-w-5xl w-full flex flex-col items-center gap-7">
+                  <div class="text-center animate-stagger delay-1">
+                    <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Sustentação</span>
+                    <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-1">PILARES DO FOCO</h2>
+                  </div>
+
+                  <div class="animate-stagger delay-2 grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
+                    ${pillars.map(p => `
+                      <div class="glass-card p-6 sm:p-7 rounded-2xl border-l-4 border-l-cyan-400">
+                        <span class="font-display text-xs font-black text-cyan-400 tracking-widest">PILAR ${p.num}</span>
+                        <h3 class="font-display text-xl sm:text-2xl font-extrabold text-white mt-1 mb-2">${p.title}</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">${p.desc}</p>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }
+          },
+          // 23: Razão + Emoção -> Decisão
+          {
+            category: "23 • Tríade da Ação",
+            title: "Razão • Emoção • Decisão",
+            render: () => `
+              <div class="max-w-5xl w-full flex flex-col items-center text-center gap-8">
+                <div class="animate-stagger delay-1">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Síntese do Movimento</span>
+                  <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-1">Da Intenção à Ação</h2>
+                </div>
+
+                <div class="animate-stagger delay-2 flex flex-col md:flex-row items-center justify-center gap-4 sm:gap-6 w-full">
+                  <div class="glass-card p-7 rounded-3xl flex-1 w-full border-blue-400/35">
+                    <span class="text-xs uppercase tracking-widest text-blue-300 font-bold">Direção</span>
+                    <h3 class="font-display text-3xl sm:text-4xl font-black text-white mt-2">RAZÃO</h3>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-2">Lógica, planejamento, análise e clareza.</p>
+                  </div>
+
+                  <div class="font-display text-4xl font-black text-cyan-400">+</div>
+
+                  <div class="glass-card p-7 rounded-3xl flex-1 w-full border-violet-400/35">
+                    <span class="text-xs uppercase tracking-widest text-violet-300 font-bold">Energia</span>
+                    <h3 class="font-display text-3xl sm:text-4xl font-black text-white mt-2">EMOÇÃO</h3>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-2">Propósito, entusiasmo, coragem e sentido.</p>
+                  </div>
+
+                  <div class="font-display text-4xl font-black text-amber-400">→</div>
+
+                  <div class="glass-panel p-7 rounded-3xl flex-1 w-full border-amber-400/50 bg-gradient-to-br from-amber-500/15 to-cyan-500/10 shadow-xl">
+                    <span class="text-xs uppercase tracking-widest text-amber-300 font-bold">Realização</span>
+                    <h3 class="font-display text-3xl sm:text-4xl font-black text-gradient-gold mt-2">DECISÃO</h3>
+                    <p class="text-xs sm:text-sm text-slate-200 mt-2">O compromisso firme que coloca o plano em marcha.</p>
+                  </div>
+                </div>
+              </div>
+            `
+          },
+          // 24: Meu Segredo
+          {
+            category: "24 • Filosofia CriaFoco",
+            title: "Meu Segredo",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-10 sm:p-16 rounded-3xl w-full border-cyan-400/35 relative overflow-hidden">
+                  <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-cyan-500/15 border border-cyan-400/40 text-cyan-300 mb-6">
+                    ${lupaIconSVG("w-7 h-7")}
+                  </div>
+                  <p class="text-base sm:text-xl text-slate-300 font-bold uppercase tracking-[0.25em] mb-4">MEU SEGREDO É:</p>
+                  <h2 class="font-display text-3xl sm:text-5xl md:text-6xl font-black text-white leading-tight">
+                    “<span class="text-gradient-cyan">FOCAR</span> ENQUANTO VIVO<br/>
+                    E <span class="text-gradient-gold">VIVER</span> ENQUANTO FOCO.”
+                  </h2>
+                </div>
+              </div>
+            `
+          },
+          // 25: Obrigado & Contatos
+          {
+            category: "25 • Encerramento & Contatos",
+            title: "Obrigado! — Isaías Eufrosino Rodrigues",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center gap-7">
+                <div class="animate-stagger delay-1 flex flex-col items-center">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-slate-950 shadow-lg">
+                      ${lupaIconSVG("w-6 h-6")}
+                    </div>
+                    <span class="font-display text-2xl font-black tracking-wider text-white">CRIA<span class="text-cyan-400">FOCO</span></span>
+                  </div>
+                  <h2 class="font-display text-5xl sm:text-7xl font-black text-gradient-cyan">OBRIGADO !!!</h2>
+                  <p class="text-lg sm:text-2xl text-white mt-2 font-bold">Isaías Eufrosino Rodrigues</p>
+                </div>
+
+                <div class="animate-stagger delay-2 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+                  <button onclick="copyText('+55 (31) 99974-0012', 'phone')" class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                    <span class="text-xs uppercase tracking-widest text-cyan-400 font-bold">WhatsApp / Telefone</span>
+                    <span class="text-sm sm:text-base font-bold text-white">+55 (31) 99974-0012</span>
+                    <span class="text-[11px] text-slate-400">Clique para copiar</span>
+                  </button>
+
+                  <button onclick="copyText('isaias.rodrigues@criafoco.com.br', 'email')" class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                    <span class="text-xs uppercase tracking-widest text-cyan-400 font-bold">E-mail</span>
+                    <span class="text-sm font-bold text-white break-all">isaias.rodrigues@criafoco.com.br</span>
+                    <span class="text-[11px] text-slate-400">Clique para copiar</span>
+                  </button>
+
+                  <a href="https://www.criafoco.com.br" target="_blank" rel="noopener noreferrer" class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                    <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">Portal Oficial</span>
+                    <span class="text-sm sm:text-base font-bold text-white">WWW.CRIAFOCO.COM.BR</span>
+                    <span class="text-[11px] text-cyan-300">Acessar site ↗</span>
+                  </a>
+                </div>
+              </div>
+            `
+          }
+        ]
+      },
+
+      // =========================================================================
+      // ENGLISH TRANSLATION — 25 SLIDES (EN)
+      // =========================================================================
+      en: {
+        ui: {
+          hint: "Use ← → or Spacebar to navigate",
+          overviewTitle: "Presentation Map (25 Slides)",
+          overviewSub: "Click any slide to jump directly to it",
+          copiedEmail: "Email copied to clipboard!",
+          copiedPhone: "Phone/WhatsApp copied!"
+        },
+        slides: [
+          {
+            category: "01 • Opening",
+            title: "CriaFoco — Isaías Eufrosino Rodrigues",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 inline-flex items-center gap-3 px-5 py-2 rounded-full glass-panel border-cyan-400/35 text-cyan-300 text-xs sm:text-sm font-bold tracking-[0.2em] uppercase mb-6">
+                  ${lupaIconSVG("w-4 h-4 text-cyan-400")}
+                  <span>WWW.CRIAFOCO.COM.BR</span>
+                </div>
+                <div class="animate-stagger delay-2 flex items-center justify-center gap-4 mb-4">
+                  <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-slate-950 shadow-xl shadow-cyan-500/25">
+                    ${lupaIconSVG("w-8 h-8 sm:w-9 sm:h-9")}
+                  </div>
+                  <h1 class="font-display text-5xl sm:text-7xl md:text-8xl font-black tracking-tight text-white">
+                    CRIA<span class="text-gradient-cyan">FOCO</span>
+                  </h1>
+                </div>
+                <p class="animate-stagger delay-3 text-base sm:text-xl text-slate-300 font-light max-w-2xl mb-9">
+                  Structured creativity, strategic clarity, and focus on execution.
+                </p>
+                <div class="animate-stagger delay-4 glass-panel px-6 py-4 rounded-2xl flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                  <div class="text-center sm:text-left">
+                    <p class="text-[11px] uppercase tracking-widest text-cyan-400 font-bold">Speaker & Consultant</p>
+                    <p class="text-base sm:text-lg font-extrabold text-white">ISAÍAS EUFROSINO RODRIGUES</p>
+                  </div>
+                  <div class="hidden sm:block w-px h-8 bg-white/15"></div>
+                  <button onclick="nextSlide()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-600 text-slate-950 font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-cyan-500/25 flex items-center gap-2 cursor-pointer">
+                    <span>Start Presentation</span>
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                  </button>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "02 • Vision & Imagination",
+            title: "If You Can Dream It, You Can Do It",
+            render: () => `
+              <div class="max-w-5xl w-full flex flex-col gap-7 items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-cyan-400/25 relative overflow-hidden">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold block mb-3">Starting Point</span>
+                  <h2 class="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight">
+                    “IF YOU CAN <span class="text-gradient-cyan">DREAM IT</span>,<br/>YOU CAN <span class="text-gradient-gold">DO IT</span>.”
+                  </h2>
+                </div>
+
+                <div class="animate-stagger delay-2 glass-card p-6 sm:p-8 rounded-2xl max-w-3xl w-full flex flex-col sm:flex-row items-center gap-5 text-left">
+                  <div class="w-12 h-12 rounded-xl bg-violet-500/20 border border-violet-400/30 flex items-center justify-center shrink-0 text-violet-300 font-display text-3xl font-bold">“</div>
+                  <div>
+                    <p class="text-lg sm:text-2xl font-medium text-slate-100 italic leading-relaxed">
+                      “IMAGINATION IS MORE IMPORTANT THAN KNOWLEDGE.”
+                    </p>
+                    <p class="text-xs sm:text-sm font-bold text-cyan-400 mt-2 tracking-wider uppercase">— Albert Einstein</p>
+                  </div>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "03 • Storytelling",
+            title: "Timeline: 4 - 9 - 12 - 20 - 30 - 60 - 70",
+            render: () => {
+              const milestones = [
+                { age: "4", stage: "Childhood", note: "Discovering the world" },
+                { age: "9", stage: "Curiosity", note: "First big questions" },
+                { age: "12", stage: "Identity", note: "Transition & dreams" },
+                { age: "20", stage: "Expansion", note: "Choices & energy" },
+                { age: "30", stage: "Building", note: "Career & purpose" },
+                { age: "60", stage: "Maturity", note: "Synthesis & wisdom" },
+                { age: "70", stage: "Fullness", note: "Legacy & story" }
+              ];
+              return `
+                <div class="max-w-6xl w-full flex flex-col items-center text-center gap-7">
+                  <div class="animate-stagger delay-1">
+                    <span class="text-xs uppercase tracking-[0.3em] text-cyan-400 font-bold">Life Timeline</span>
+                    <h2 class="font-display text-4xl sm:text-6xl font-black text-white mt-1">STORYTELLING</h2>
+                  </div>
+
+                  <div class="animate-stagger delay-2 w-full relative py-4">
+                    <div class="hidden lg:block absolute top-1/2 left-8 right-8 h-0.5 bg-gradient-to-r from-cyan-500/20 via-cyan-400 to-amber-400/40 -translate-y-1/2"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4 relative z-10">
+                      ${milestones.map((m, idx) => `
+                        <div class="glass-card rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center ${idx === 4 ? 'border-cyan-400/60 bg-cyan-500/10' : ''}">
+                          <span class="font-display text-3xl sm:text-4xl font-black text-gradient-cyan">${m.age}</span>
+                          <span class="text-xs font-bold uppercase tracking-wider text-white mt-2">${m.stage}</span>
+                          <span class="text-[11px] text-slate-400 mt-1">${m.note}</span>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+          },
+          {
+            category: "04 • Life Purpose",
+            title: "No Presentation Can Be Better Than Your Life",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-14 rounded-3xl border-amber-400/30 relative overflow-hidden">
+                  <span class="text-xs uppercase tracking-[0.25em] text-amber-300 font-bold block mb-5">Essential Reflection</span>
+                  <blockquote class="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                    “No presentation of your professional capabilities can ever be better than your <span class="text-gradient-gold">LIFE</span>.”
+                  </blockquote>
+                  <p class="text-sm sm:text-base font-bold text-cyan-400 uppercase tracking-[0.2em] mt-7">— Dr. Shigeaki Hinohara</p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "05 • Creative Process",
+            title: "Creative Process — The 5 Stages",
+            render: () => {
+              const steps = [
+                { num: "01", title: "RESTLESSNESS", sub: "Dqm" },
+                { num: "02", title: "PREPARATION", sub: "Immersion" },
+                { num: "03", title: "INCUBATION", sub: "Maturation" },
+                { num: "04", title: "ILLUMINATION", sub: "Insight" },
+                { num: "05", title: "VERIFICATION", sub: "Validation" }
+              ];
+              return `
+                <div class="max-w-6xl w-full flex flex-col items-center text-center gap-8">
+                  <div class="animate-stagger delay-1">
+                    <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Journey of Creation</span>
+                    <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-1">CREATIVE PROCESS</h2>
+                  </div>
+
+                  <div class="animate-stagger delay-2 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 w-full">
+                    ${steps.map((s, idx) => `
+                      <button onclick="goToSlide(${5 + idx})" class="glass-card p-6 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer group">
+                        <span class="font-display text-3xl font-black text-cyan-400 group-hover:scale-110 transition-transform">${s.num}</span>
+                        <h3 class="font-display text-lg font-extrabold text-white mt-3 tracking-wide">${s.title}</h3>
+                        <span class="text-xs text-slate-400 mt-1">${s.sub}</span>
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }
+          },
+          {
+            category: "06 • Creative Process (1/5)",
+            title: "Restlessness — Dqm",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-cyan-400/35">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Stage 01 of 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-gradient-cyan mb-4">RESTLESSNESS</h2>
+                  <div class="inline-block px-5 py-2 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-300 font-display text-xl sm:text-2xl font-extrabold tracking-wider mb-6">
+                    Dqm
+                  </div>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    The spark of creation: constructive discomfort that challenges the status quo, awakens curiosity, and asks the right questions.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "07 • Creative Process (2/5)",
+            title: "Preparation",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-blue-400/35">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Stage 02 of 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-6">PREPARATION</h2>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Deep immersion into the challenge: gathering data, researching, observing actively, and expanding technical and human repertoire.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "08 • Creative Process (3/5)",
+            title: "Incubation",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-violet-400/35">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-violet-500/15 border border-violet-400/30 text-violet-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Stage 03 of 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-gradient-violet mb-6">INCUBATION</h2>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Silent maturation: when the mind connects seemingly distant ideas behind the scenes of the subconscious.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "09 • Creative Process (4/5)",
+            title: "Illumination",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-amber-400/40">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-500/15 border border-amber-400/35 text-amber-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Stage 04 of 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-gradient-gold mb-6">ILLUMINATION</h2>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    The flash of clarity and synthesis — the “Eureka” moment when the solution emerges with sharp direction.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "10 • Creative Process (5/5)",
+            title: "Verification",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-emerald-400/35">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Stage 05 of 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-6">VERIFICATION</h2>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    The reality test: prototyping, refining, validating in practice, and turning insight into tangible results.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "11 • Ideation Tool",
+            title: "Stimulus Cube",
+            render: () => `
+              <div class="max-w-5xl w-full flex flex-col items-center gap-7">
+                <div class="text-center animate-stagger delay-1">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">3D Matrix</span>
+                  <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-1">STIMULUS CUBE</h2>
+                </div>
+
+                <div class="animate-stagger delay-2 grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+                  <div class="glass-card p-6 sm:p-7 rounded-3xl border-t-4 border-t-cyan-400 text-center">
+                    <span class="text-xs font-bold uppercase tracking-widest text-cyan-400">Axis 01</span>
+                    <h3 class="font-display text-2xl font-extrabold text-white mt-2 mb-3">Feelings</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">Human perceptions, empathy, pains, and desires that create genuine connection.</p>
+                  </div>
+
+                  <div class="glass-card p-6 sm:p-7 rounded-3xl border-t-4 border-t-violet-400 text-center">
+                    <span class="text-xs font-bold uppercase tracking-widest text-violet-400">Axis 02</span>
+                    <h3 class="font-display text-2xl font-extrabold text-white mt-2 mb-3">Operational Stages</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">Real environments, contexts, and channels where interactions take place.</p>
+                  </div>
+
+                  <div class="glass-card p-6 sm:p-7 rounded-3xl border-t-4 border-t-amber-400 text-center">
+                    <span class="text-xs font-bold uppercase tracking-widest text-amber-400">Axis 03</span>
+                    <h3 class="font-display text-2xl font-extrabold text-white mt-2 mb-3">5W2H</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">Objective execution framework: What, Why, Where, When, Who, How, and How Much.</p>
+                  </div>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "12 • SCRIPT Methodology",
+            title: "SCRIPT Methodology — Overview",
+            render: () => {
+              const letters = [
+                { l: "S", t: "Support", slideIdx: 12 },
+                { l: "C", t: "Client", slideIdx: 13 },
+                { l: "R", t: "Resources", slideIdx: 14 },
+                { l: "I", t: "Investigation", slideIdx: 15 },
+                { l: "P", t: "Plan", slideIdx: 16 },
+                { l: "T", t: "Team", slideIdx: 17 }
+              ];
+              return `
+                <div class="max-w-5xl w-full flex flex-col items-center text-center gap-8">
+                  <div class="animate-stagger delay-1">
+                    <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Strategic Roadmap</span>
+                    <h2 class="font-display text-4xl sm:text-6xl font-black text-gradient-cyan mt-1">SCRIPT</h2>
+                    <p class="text-sm sm:text-base text-slate-300 mt-2">Click any letter to focus individually on each pillar</p>
+                  </div>
+
+                  <div class="animate-stagger delay-2 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
+                    ${letters.map((item) => `
+                      <button onclick="goToSlide(${item.slideIdx})" class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center cursor-pointer group">
+                        <span class="font-display text-4xl font-black text-white group-hover:text-cyan-300 transition-colors">${item.l}</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 mt-2">${item.t}</span>
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }
+          },
+          {
+            category: "13 • SCRIPT Methodology (S)",
+            title: "S for Support",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-violet-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Back to SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-violet-500/25">S</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-violet-300 font-bold block mb-2">Pillar 01 of 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">for SUPPORT</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Supporters and key partners who strengthen and sustain the project.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "14 • SCRIPT Methodology (C)",
+            title: "C for Client",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-cyan-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Back to SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-cyan-500/25">C</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-300 font-bold block mb-2">Pillar 02 of 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">for CLIENT</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Value delivered, identifying strategic Channels, and establishing clear Communication.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "15 • SCRIPT Methodology (R)",
+            title: "R for Resources",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-blue-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Back to SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-blue-500/25">R</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-blue-300 font-bold block mb-2">Pillar 03 of 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">for RESOURCES</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Infrastructure, suppliers, funding sources, and allocation destinations.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "16 • SCRIPT Methodology (I)",
+            title: "I for Investigation",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-amber-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Back to SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-amber-500/25">I</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-amber-300 font-bold block mb-2">Pillar 04 of 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">for INVESTIGATION</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Strengths, Opportunities, Weaknesses, and Threats (SWOT Matrix).
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "17 • SCRIPT Methodology (P)",
+            title: "P for Plan",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-emerald-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Back to SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-emerald-500/25">P</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-emerald-300 font-bold block mb-2">Pillar 05 of 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">for PLAN</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Who, when, where, how, what, why, and control checkpoints (5W2H).
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "18 • SCRIPT Methodology (T)",
+            title: "T for Team",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-cyan-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Back to SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-cyan-400 to-sky-500 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-cyan-500/25">T</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-300 font-bold block mb-2">Pillar 06 of 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">for TEAM</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Build a vision of partnership, engagement, and shared purpose.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "19 • The Essence of Focus",
+            title: "Focusing Means Saying No",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-9 sm:p-14 rounded-3xl border-cyan-400/35">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold block mb-4">Clarity of Choice</span>
+                  <h2 class="font-display text-3xl sm:text-5xl md:text-6xl font-black text-white leading-tight">
+                    “FOCUSING MEANS SAYING <span class="text-gradient-gold">NO</span> TO HUNDREDS OF GOOD IDEAS.”
+                  </h2>
+                  <p class="text-sm sm:text-base font-bold text-slate-300 uppercase tracking-[0.2em] mt-7">— Steve Jobs</p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "20 • Why Focus?",
+            title: "Infinite Possibilities & Finite Capacity",
+            render: () => `
+              <div class="max-w-5xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-14 rounded-3xl border-cyan-400/30">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold block mb-5">Human Foundation</span>
+                  <h2 class="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                    WE NEED FOCUS BECAUSE WE ARE BEINGS WITH <span class="text-gradient-cyan">INFINITE POSSIBILITIES OF CHOICE</span> AND <span class="text-gradient-gold">FINITE CAPACITY FOR EXECUTION</span>.
+                  </h2>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "21 • Freedom of Attitude",
+            title: "The Last of the Human Freedoms",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl border-violet-400/30">
+                  <span class="text-xs uppercase tracking-[0.25em] text-violet-300 font-bold block mb-5">Inner Autonomy</span>
+                  <blockquote class="font-display text-xl sm:text-3xl md:text-4xl font-bold text-white leading-snug">
+                    “...Everything can be taken from a man but one thing: the last of the human freedoms — <span class="text-gradient-cyan">to choose one’s attitude</span> in any given set of circumstances...”
+                  </blockquote>
+                  <p class="text-sm sm:text-base font-bold text-amber-300 uppercase tracking-[0.2em] mt-7">— Viktor Frankl</p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "22 • Pillars of Focus",
+            title: "The Pillars of Focus",
+            render: () => {
+              const pillars = [
+                {
+                  num: "01",
+                  title: "ENVIRONMENT",
+                  desc: "Physical, digital, and relational space designed to eliminate noise and foster deep focus."
+                },
+                {
+                  num: "02",
+                  title: "LÉMTITUDE",
+                  desc: "Conscious slowness combined with strategic altitude: pausing to see the big picture clearly."
+                },
+                {
+                  num: "03",
+                  title: "MOBILIZING INFORMATION",
+                  desc: "Selective knowledge that sparks immediate action and transformation rather than overload."
+                },
+                {
+                  num: "04",
+                  title: "VISION OF THE FUTURE",
+                  desc: "Clear direction of where you want to go to guide today's priorities and trade-offs."
+                }
+              ];
+              return `
+                <div class="max-w-5xl w-full flex flex-col items-center gap-7">
+                  <div class="text-center animate-stagger delay-1">
+                    <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Foundation</span>
+                    <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-1">PILLARS OF FOCUS</h2>
+                  </div>
+
+                  <div class="animate-stagger delay-2 grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
+                    ${pillars.map(p => `
+                      <div class="glass-card p-6 sm:p-7 rounded-2xl border-l-4 border-l-cyan-400">
+                        <span class="font-display text-xs font-black text-cyan-400 tracking-widest">PILLAR ${p.num}</span>
+                        <h3 class="font-display text-xl sm:text-2xl font-extrabold text-white mt-1 mb-2">${p.title}</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">${p.desc}</p>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }
+          },
+          {
+            category: "23 • Triad of Action",
+            title: "Reason • Emotion • Decision",
+            render: () => `
+              <div class="max-w-5xl w-full flex flex-col items-center text-center gap-8">
+                <div class="animate-stagger delay-1">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Synthesis of Momentum</span>
+                  <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-1">From Intention to Action</h2>
+                </div>
+
+                <div class="animate-stagger delay-2 flex flex-col md:flex-row items-center justify-center gap-4 sm:gap-6 w-full">
+                  <div class="glass-card p-7 rounded-3xl flex-1 w-full border-blue-400/35">
+                    <span class="text-xs uppercase tracking-widest text-blue-300 font-bold">Direction</span>
+                    <h3 class="font-display text-3xl sm:text-4xl font-black text-white mt-2">REASON</h3>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-2">Logic, planning, analysis, and clarity.</p>
+                  </div>
+
+                  <div class="font-display text-4xl font-black text-cyan-400">+</div>
+
+                  <div class="glass-card p-7 rounded-3xl flex-1 w-full border-violet-400/35">
+                    <span class="text-xs uppercase tracking-widest text-violet-300 font-bold">Energy</span>
+                    <h3 class="font-display text-3xl sm:text-4xl font-black text-white mt-2">EMOTION</h3>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-2">Purpose, enthusiasm, courage, and meaning.</p>
+                  </div>
+
+                  <div class="font-display text-4xl font-black text-amber-400">→</div>
+
+                  <div class="glass-panel p-7 rounded-3xl flex-1 w-full border-amber-400/50 bg-gradient-to-br from-amber-500/15 to-cyan-500/10 shadow-xl">
+                    <span class="text-xs uppercase tracking-widest text-amber-300 font-bold">Execution</span>
+                    <h3 class="font-display text-3xl sm:text-4xl font-black text-gradient-gold mt-2">DECISION</h3>
+                    <p class="text-xs sm:text-sm text-slate-200 mt-2">The firm commitment that sets the plan in motion.</p>
+                  </div>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "24 • CriaFoco Philosophy",
+            title: "My Secret",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-10 sm:p-16 rounded-3xl w-full border-cyan-400/35 relative overflow-hidden">
+                  <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-cyan-500/15 border border-cyan-400/40 text-cyan-300 mb-6">
+                    ${lupaIconSVG("w-7 h-7")}
+                  </div>
+                  <p class="text-base sm:text-xl text-slate-300 font-bold uppercase tracking-[0.25em] mb-4">MY SECRET IS:</p>
+                  <h2 class="font-display text-3xl sm:text-5xl md:text-6xl font-black text-white leading-tight">
+                    “TO <span class="text-gradient-cyan">FOCUS</span> WHILE I LIVE<br/>
+                    AND TO <span class="text-gradient-gold">LIVE</span> WHILE I FOCUS.”
+                  </h2>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "25 • Closing & Contacts",
+            title: "Thank You! — Isaías Eufrosino Rodrigues",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center gap-7">
+                <div class="animate-stagger delay-1 flex flex-col items-center">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-slate-950 shadow-lg">
+                      ${lupaIconSVG("w-6 h-6")}
+                    </div>
+                    <span class="font-display text-2xl font-black tracking-wider text-white">CRIA<span class="text-cyan-400">FOCO</span></span>
+                  </div>
+                  <h2 class="font-display text-5xl sm:text-7xl font-black text-gradient-cyan">THANK YOU !!!</h2>
+                  <p class="text-lg sm:text-2xl text-white mt-2 font-bold">Isaías Eufrosino Rodrigues</p>
+                </div>
+
+                <div class="animate-stagger delay-2 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+                  <button onclick="copyText('+55 (31) 99974-0012', 'phone')" class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                    <span class="text-xs uppercase tracking-widest text-cyan-400 font-bold">WhatsApp / Phone</span>
+                    <span class="text-sm sm:text-base font-bold text-white">+55 (31) 99974-0012</span>
+                    <span class="text-[11px] text-slate-400">Click to copy</span>
+                  </button>
+
+                  <button onclick="copyText('isaias.rodrigues@criafoco.com.br', 'email')" class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                    <span class="text-xs uppercase tracking-widest text-cyan-400 font-bold">Email</span>
+                    <span class="text-sm font-bold text-white break-all">isaias.rodrigues@criafoco.com.br</span>
+                    <span class="text-[11px] text-slate-400">Click to copy</span>
+                  </button>
+
+                  <a href="https://www.criafoco.com.br" target="_blank" rel="noopener noreferrer" class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                    <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">Official Portal</span>
+                    <span class="text-sm sm:text-base font-bold text-white">WWW.CRIAFOCO.COM.BR</span>
+                    <span class="text-[11px] text-cyan-300">Visit website ↗</span>
+                  </a>
+                </div>
+              </div>
+            `
+          }
+        ]
+      },
+
+      // =========================================================================
+      // SPANISH TRANSLATION — 25 SLIDES (ES)
+      // =========================================================================
+      es: {
+        ui: {
+          hint: "Usa ← → o Espacio para navegar",
+          overviewTitle: "Mapa de la Presentación (25 Diapositivas)",
+          overviewSub: "Haz clic en cualquier diapositiva para ir directamente",
+          copiedEmail: "¡Correo copiado al portapapeles!",
+          copiedPhone: "¡Teléfono/WhatsApp copiado!"
+        },
+        slides: [
+          {
+            category: "01 • Apertura",
+            title: "CriaFoco — Isaías Eufrosino Rodrigues",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 inline-flex items-center gap-3 px-5 py-2 rounded-full glass-panel border-cyan-400/35 text-cyan-300 text-xs sm:text-sm font-bold tracking-[0.2em] uppercase mb-6">
+                  ${lupaIconSVG("w-4 h-4 text-cyan-400")}
+                  <span>WWW.CRIAFOCO.COM.BR</span>
+                </div>
+                <div class="animate-stagger delay-2 flex items-center justify-center gap-4 mb-4">
+                  <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-slate-950 shadow-xl shadow-cyan-500/25">
+                    ${lupaIconSVG("w-8 h-8 sm:w-9 sm:h-9")}
+                  </div>
+                  <h1 class="font-display text-5xl sm:text-7xl md:text-8xl font-black tracking-tight text-white">
+                    CRIA<span class="text-gradient-cyan">FOCO</span>
+                  </h1>
+                </div>
+                <p class="animate-stagger delay-3 text-base sm:text-xl text-slate-300 font-light max-w-2xl mb-9">
+                  Creatividad estructurada, claridad estratégica y enfoque en la realización.
+                </p>
+                <div class="animate-stagger delay-4 glass-panel px-6 py-4 rounded-2xl flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                  <div class="text-center sm:text-left">
+                    <p class="text-[11px] uppercase tracking-widest text-cyan-400 font-bold">Conferencista y Consultor</p>
+                    <p class="text-base sm:text-lg font-extrabold text-white">ISAÍAS EUFROSINO RODRIGUES</p>
+                  </div>
+                  <div class="hidden sm:block w-px h-8 bg-white/15"></div>
+                  <button onclick="nextSlide()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-600 text-slate-950 font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-cyan-500/25 flex items-center gap-2 cursor-pointer">
+                    <span>Iniciar Presentación</span>
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                  </button>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "02 • Visión e Imaginación",
+            title: "Si Puedes Soñarlo, Puedes Hacerlo",
+            render: () => `
+              <div class="max-w-5xl w-full flex flex-col gap-7 items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-cyan-400/25 relative overflow-hidden">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold block mb-3">Punto de Partida</span>
+                  <h2 class="font-display text-3xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight">
+                    “SI PUEDES <span class="text-gradient-cyan">SOÑARLO</span>,<br/>PUEDES <span class="text-gradient-gold">HACERLO</span>.”
+                  </h2>
+                </div>
+
+                <div class="animate-stagger delay-2 glass-card p-6 sm:p-8 rounded-2xl max-w-3xl w-full flex flex-col sm:flex-row items-center gap-5 text-left">
+                  <div class="w-12 h-12 rounded-xl bg-violet-500/20 border border-violet-400/30 flex items-center justify-center shrink-0 text-violet-300 font-display text-3xl font-bold">“</div>
+                  <div>
+                    <p class="text-lg sm:text-2xl font-medium text-slate-100 italic leading-relaxed">
+                      “LA IMAGINACIÓN ES MÁS IMPORTANTE QUE EL CONOCIMIENTO.”
+                    </p>
+                    <p class="text-xs sm:text-sm font-bold text-cyan-400 mt-2 tracking-wider uppercase">— Albert Einstein</p>
+                  </div>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "03 • Historiando",
+            title: "Historiando: 4 - 9 - 12 - 20 - 30 - 60 - 70",
+            render: () => {
+              const milestones = [
+                { age: "4", stage: "Infancia", note: "Descubrimiento del mundo" },
+                { age: "9", stage: "Curiosidad", note: "Primeros porqués" },
+                { age: "12", stage: "Identidad", note: "Transición y sueños" },
+                { age: "20", stage: "Expansión", note: "Elecciones y energía" },
+                { age: "30", stage: "Construcción", note: "Carrera y propósito" },
+                { age: "60", stage: "Madurez", note: "Síntesis y sabiduría" },
+                { age: "70", stage: "Plenitud", note: "Legado e historia" }
+              ];
+              return `
+                <div class="max-w-6xl w-full flex flex-col items-center text-center gap-7">
+                  <div class="animate-stagger delay-1">
+                    <span class="text-xs uppercase tracking-[0.3em] text-cyan-400 font-bold">Línea del Tiempo</span>
+                    <h2 class="font-display text-4xl sm:text-6xl font-black text-white mt-1">HISTORIANDO</h2>
+                  </div>
+
+                  <div class="animate-stagger delay-2 w-full relative py-4">
+                    <div class="hidden lg:block absolute top-1/2 left-8 right-8 h-0.5 bg-gradient-to-r from-cyan-500/20 via-cyan-400 to-amber-400/40 -translate-y-1/2"></div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4 relative z-10">
+                      ${milestones.map((m, idx) => `
+                        <div class="glass-card rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center ${idx === 4 ? 'border-cyan-400/60 bg-cyan-500/10' : ''}">
+                          <span class="font-display text-3xl sm:text-4xl font-black text-gradient-cyan">${m.age}</span>
+                          <span class="text-xs font-bold uppercase tracking-wider text-white mt-2">${m.stage}</span>
+                          <span class="text-[11px] text-slate-400 mt-1">${m.note}</span>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+          },
+          {
+            category: "04 • Propósito de Vida",
+            title: "Ninguna Presentación Puede Ser Mejor Que Tu Vida",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-14 rounded-3xl border-amber-400/30 relative overflow-hidden">
+                  <span class="text-xs uppercase tracking-[0.25em] text-amber-300 font-bold block mb-5">Reflexión Esencial</span>
+                  <blockquote class="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                    “Ninguna presentación de tus capacidades profesionales puede ser mejor que tu <span class="text-gradient-gold">VIDA</span>.”
+                  </blockquote>
+                  <p class="text-sm sm:text-base font-bold text-cyan-400 uppercase tracking-[0.2em] mt-7">— Dr. Shigeaki Hinohara</p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "05 • Proceso Creativo",
+            title: "Proceso Creativo — Las 5 Etapas",
+            render: () => {
+              const steps = [
+                { num: "01", title: "INQUIETUD", sub: "Dqm" },
+                { num: "02", title: "PREPARACIÓN", sub: "Inmersión" },
+                { num: "03", title: "INCUBACIÓN", sub: "Maduración" },
+                { num: "04", title: "ILUMINACIÓN", sub: "Insight" },
+                { num: "05", title: "VERIFICACIÓN", sub: "Validación" }
+              ];
+              return `
+                <div class="max-w-6xl w-full flex flex-col items-center text-center gap-8">
+                  <div class="animate-stagger delay-1">
+                    <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Viaje de la Creación</span>
+                    <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-1">PROCESO CREATIVO</h2>
+                  </div>
+
+                  <div class="animate-stagger delay-2 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 w-full">
+                    ${steps.map((s, idx) => `
+                      <button onclick="goToSlide(${5 + idx})" class="glass-card p-6 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer group">
+                        <span class="font-display text-3xl font-black text-cyan-400 group-hover:scale-110 transition-transform">${s.num}</span>
+                        <h3 class="font-display text-lg font-extrabold text-white mt-3 tracking-wide">${s.title}</h3>
+                        <span class="text-xs text-slate-400 mt-1">${s.sub}</span>
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }
+          },
+          {
+            category: "06 • Proceso Creativo (1/5)",
+            title: "Inquietud — Dqm",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-cyan-400/35">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Etapa 01 de 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-gradient-cyan mb-4">INQUIETUD</h2>
+                  <div class="inline-block px-5 py-2 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-300 font-display text-xl sm:text-2xl font-extrabold tracking-wider mb-6">
+                    Dqm
+                  </div>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    La chispa de la creación: la incomodidad constructiva que desafía el statu quo, despierta la curiosidad y formula las preguntas correctas.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "07 • Proceso Creativo (2/5)",
+            title: "Preparación",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-blue-400/35">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Etapa 02 de 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-6">PREPARACIÓN</h2>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Inmersión profunda en el desafío: recolección de datos, investigación, observación activa y ampliación del repertorio técnico y humano.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "08 • Proceso Creativo (3/5)",
+            title: "Incubación",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-violet-400/35">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-violet-500/15 border border-violet-400/30 text-violet-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Etapa 03 de 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-gradient-violet mb-6">INCUBACIÓN</h2>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Maduración silenciosa: cuando la mente conecta ideas aparentemente distantes entre bastidores del subconsciente.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "09 • Proceso Creativo (4/5)",
+            title: "Iluminación",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-amber-400/40">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-500/15 border border-amber-400/35 text-amber-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Etapa 04 de 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-gradient-gold mb-6">ILUMINACIÓN</h2>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    El instante de claridad y síntesis — el momento “Eureka” en que la solución emerge con nitidez y dirección.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "10 • Proceso Creativo (5/5)",
+            title: "Verificación",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-12 rounded-3xl w-full border-emerald-400/35">
+                  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-widest mb-4">
+                    Etapa 05 de 05
+                  </div>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-6">VERIFICACIÓN</h2>
+                  <p class="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    La prueba de la realidad: probar, pulir, validar en la práctica y transformar el hallazgo en resultado concreto.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "11 • Herramienta de Ideación",
+            title: "Cubo de Estímulos",
+            render: () => `
+              <div class="max-w-5xl w-full flex flex-col items-center gap-7">
+                <div class="text-center animate-stagger delay-1">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Matriz Tridimensional</span>
+                  <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-1">CUBO DE ESTÍMULOS</h2>
+                </div>
+
+                <div class="animate-stagger delay-2 grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+                  <div class="glass-card p-6 sm:p-7 rounded-3xl border-t-4 border-t-cyan-400 text-center">
+                    <span class="text-xs font-bold uppercase tracking-widest text-cyan-400">Eje 01</span>
+                    <h3 class="font-display text-2xl font-extrabold text-white mt-2 mb-3">Sentimientos</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">Percepciones humanas, empatía, dolores y deseos que generan conexión genuina.</p>
+                  </div>
+
+                  <div class="glass-card p-6 sm:p-7 rounded-3xl border-t-4 border-t-violet-400 text-center">
+                    <span class="text-xs font-bold uppercase tracking-widest text-violet-400">Eje 02</span>
+                    <h3 class="font-display text-2xl font-extrabold text-white mt-2 mb-3">Escenarios Operacionales</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">Entornos, contextos y canales reales donde ocurren las interacciones.</p>
+                  </div>
+
+                  <div class="glass-card p-6 sm:p-7 rounded-3xl border-t-4 border-t-amber-400 text-center">
+                    <span class="text-xs font-bold uppercase tracking-widest text-amber-400">Eje 03</span>
+                    <h3 class="font-display text-2xl font-extrabold text-white mt-2 mb-3">5W2H</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">Estructura objetiva de ejecución: Qué, Por qué, Dónde, Cuándo, Quién, Cómo y Cuánto.</p>
+                  </div>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "12 • Metodología SCRIPT",
+            title: "Metodología SCRIPT — Visión General",
+            render: () => {
+              const letters = [
+                { l: "S", t: "Soporte", slideIdx: 12 },
+                { l: "C", t: "Cliente", slideIdx: 13 },
+                { l: "R", t: "Recursos", slideIdx: 14 },
+                { l: "I", t: "Investigación", slideIdx: 15 },
+                { l: "P", t: "Plan", slideIdx: 16 },
+                { l: "T", t: "Time", slideIdx: 17 }
+              ];
+              return `
+                <div class="max-w-5xl w-full flex flex-col items-center text-center gap-8">
+                  <div class="animate-stagger delay-1">
+                    <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Hoja de Ruta Estratégica</span>
+                    <h2 class="font-display text-4xl sm:text-6xl font-black text-gradient-cyan mt-1">SCRIPT</h2>
+                    <p class="text-sm sm:text-base text-slate-300 mt-2">Haz clic en una letra para enfocarte individualmente en cada pilar</p>
+                  </div>
+
+                  <div class="animate-stagger delay-2 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
+                    ${letters.map((item) => `
+                      <button onclick="goToSlide(${item.slideIdx})" class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center cursor-pointer group">
+                        <span class="font-display text-4xl font-black text-white group-hover:text-cyan-300 transition-colors">${item.l}</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 mt-2">${item.t}</span>
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }
+          },
+          {
+            category: "13 • Metodología SCRIPT (S)",
+            title: "S de Soporte",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-violet-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Volver a SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-violet-500/25">S</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-violet-300 font-bold block mb-2">Pilar 01 de 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">de SOPORTE</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Aliados y socios clave que fortalecen y sostienen el proyecto.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "14 • Metodología SCRIPT (C)",
+            title: "C de Cliente",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-cyan-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Volver a SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-cyan-500/25">C</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-300 font-bold block mb-2">Pilar 02 de 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">de CLIENTE</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Valor, identificar Canales estratégicos y establecer una Comunicación clara.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "15 • Metodología SCRIPT (R)",
+            title: "R de Recursos",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-blue-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Volver a SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-blue-500/25">R</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-blue-300 font-bold block mb-2">Pilar 03 de 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">de RECURSOS</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Infraestructura, proveedores, fuentes de captación y destinos de aplicación.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "16 • Metodología SCRIPT (I)",
+            title: "I de Investigación",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-amber-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Volver a SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-amber-500/25">I</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-amber-300 font-bold block mb-2">Pilar 04 de 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">de INVESTIGACIÓN</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Fortalezas, Oportunidades, Debilidades y Amenazas (Matriz FODA).
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "17 • Metodología SCRIPT (P)",
+            title: "P de Plan",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-emerald-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Volver a SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-emerald-500/25">P</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-emerald-300 font-bold block mb-2">Pilar 05 de 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">de PLAN</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Quién, cuándo, dónde, cómo, qué, por qué y puntos de control (5W2H).
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "18 • Metodología SCRIPT (T)",
+            title: "T de Time",
+            render: () => `
+              <div class="max-w-4xl w-full flex flex-col items-center text-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl w-full border-cyan-400/40 relative">
+                  <button onclick="goToSlide(11)" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 transition-all cursor-pointer">
+                    <span>← Volver a SCRIPT</span>
+                  </button>
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-cyan-400 to-sky-500 flex items-center justify-center font-display text-4xl sm:text-5xl font-black text-slate-950 mx-auto mb-5 shadow-lg shadow-cyan-500/25">T</div>
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-300 font-bold block mb-2">Pilar 06 de 06</span>
+                  <h2 class="font-display text-4xl sm:text-6xl font-black text-white mb-5">de TIME (EQUIPO)</h2>
+                  <p class="text-lg sm:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
+                    Construye una visión de alianza, compromiso y propósito compartido.
+                  </p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "19 • La Esencia del Enfoque",
+            title: "Enfocarse Significa Decir No",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-9 sm:p-14 rounded-3xl border-cyan-400/35">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold block mb-4">Claridad de Elección</span>
+                  <h2 class="font-display text-3xl sm:text-5xl md:text-6xl font-black text-white leading-tight">
+                    “ENFOCARSE SIGNIFICA DECIR <span class="text-gradient-gold">NO</span> A CIENTOS DE BUENAS IDEAS.”
+                  </h2>
+                  <p class="text-sm sm:text-base font-bold text-slate-300 uppercase tracking-[0.2em] mt-7">— Steve Jobs</p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "20 • ¿Por Qué Enfocarnos?",
+            title: "Infinitas Posibilidades y Finita Realización",
+            render: () => `
+              <div class="max-w-5xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-14 rounded-3xl border-cyan-400/30">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold block mb-5">Fundamento Humano</span>
+                  <h2 class="font-display text-2xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                    NECESITAMOS ENFOQUE PORQUE SOMOS SERES CON <span class="text-gradient-cyan">INFINITAS POSIBILIDADES DE ELECCIÓN</span> Y <span class="text-gradient-gold">FINITA CAPACIDAD DE REALIZACIÓN</span>.
+                  </h2>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "21 • Libertad de Actitud",
+            title: "La Última de las Libertades Humanas",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-8 sm:p-13 rounded-3xl border-violet-400/30">
+                  <span class="text-xs uppercase tracking-[0.25em] text-violet-300 font-bold block mb-5">Autonomía Interior</span>
+                  <blockquote class="font-display text-xl sm:text-3xl md:text-4xl font-bold text-white leading-snug">
+                    “...Al hombre se le puede arrebatar todo salvo una cosa: la última de las libertades humanas — <span class="text-gradient-cyan">elegir su actitud</span> ante cualquier circunstancia...”
+                  </blockquote>
+                  <p class="text-sm sm:text-base font-bold text-amber-300 uppercase tracking-[0.2em] mt-7">— Viktor Frankl</p>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "22 • Pilares del Enfoque",
+            title: "Los Pilares del Enfoque",
+            render: () => {
+              const pillars = [
+                {
+                  num: "01",
+                  title: "AMBIENTE",
+                  desc: "Espacio físico, digital y relacional diseñado para eliminar ruidos y favorecer la atención plena."
+                },
+                {
+                  num: "02",
+                  title: "LÉMTITUDE",
+                  desc: "La unión de lentitud consciente con altitud estratégica: pausar para ver el panorama completo con claridad."
+                },
+                {
+                  num: "03",
+                  title: "INFORMACIÓN MOVILIZADORA",
+                  desc: "Conocimiento selectivo que genera acción inmediata y transformación en lugar de sobrecarga mental."
+                },
+                {
+                  num: "04",
+                  title: "VISIÓN DE FUTURO",
+                  desc: "Dirección clara de adónde se quiere llegar para guiar las prioridades y renuncias del presente."
+                }
+              ];
+              return `
+                <div class="max-w-5xl w-full flex flex-col items-center gap-7">
+                  <div class="text-center animate-stagger delay-1">
+                    <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Sustentación</span>
+                    <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-1">PILARES DEL ENFOQUE</h2>
+                  </div>
+
+                  <div class="animate-stagger delay-2 grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
+                    ${pillars.map(p => `
+                      <div class="glass-card p-6 sm:p-7 rounded-2xl border-l-4 border-l-cyan-400">
+                        <span class="font-display text-xs font-black text-cyan-400 tracking-widest">PILAR ${p.num}</span>
+                        <h3 class="font-display text-xl sm:text-2xl font-extrabold text-white mt-1 mb-2">${p.title}</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">${p.desc}</p>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }
+          },
+          {
+            category: "23 • Tríada de la Acción",
+            title: "Razón • Emoción • Decisión",
+            render: () => `
+              <div class="max-w-5xl w-full flex flex-col items-center text-center gap-8">
+                <div class="animate-stagger delay-1">
+                  <span class="text-xs uppercase tracking-[0.25em] text-cyan-400 font-bold">Síntesis del Movimiento</span>
+                  <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-1">De la Intención a la Acción</h2>
+                </div>
+
+                <div class="animate-stagger delay-2 flex flex-col md:flex-row items-center justify-center gap-4 sm:gap-6 w-full">
+                  <div class="glass-card p-7 rounded-3xl flex-1 w-full border-blue-400/35">
+                    <span class="text-xs uppercase tracking-widest text-blue-300 font-bold">Dirección</span>
+                    <h3 class="font-display text-3xl sm:text-4xl font-black text-white mt-2">RAZÓN</h3>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-2">Lógica, planificación, análisis y claridad.</p>
+                  </div>
+
+                  <div class="font-display text-4xl font-black text-cyan-400">+</div>
+
+                  <div class="glass-card p-7 rounded-3xl flex-1 w-full border-violet-400/35">
+                    <span class="text-xs uppercase tracking-widest text-violet-300 font-bold">Energía</span>
+                    <h3 class="font-display text-3xl sm:text-4xl font-black text-white mt-2">EMOCIÓN</h3>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-2">Propósito, entusiasmo, coraje y sentido.</p>
+                  </div>
+
+                  <div class="font-display text-4xl font-black text-amber-400">→</div>
+
+                  <div class="glass-panel p-7 rounded-3xl flex-1 w-full border-amber-400/50 bg-gradient-to-br from-amber-500/15 to-cyan-500/10 shadow-xl">
+                    <span class="text-xs uppercase tracking-widest text-amber-300 font-bold">Realización</span>
+                    <h3 class="font-display text-3xl sm:text-4xl font-black text-gradient-gold mt-2">DECISIÓN</h3>
+                    <p class="text-xs sm:text-sm text-slate-200 mt-2">El compromiso firme que pone el plan en marcha.</p>
+                  </div>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "24 • Filosofía CriaFoco",
+            title: "Mi Secreto",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center">
+                <div class="animate-stagger delay-1 glass-panel p-10 sm:p-16 rounded-3xl w-full border-cyan-400/35 relative overflow-hidden">
+                  <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-cyan-500/15 border border-cyan-400/40 text-cyan-300 mb-6">
+                    ${lupaIconSVG("w-7 h-7")}
+                  </div>
+                  <p class="text-base sm:text-xl text-slate-300 font-bold uppercase tracking-[0.25em] mb-4">MI SECRETO ES:</p>
+                  <h2 class="font-display text-3xl sm:text-5xl md:text-6xl font-black text-white leading-tight">
+                    “<span class="text-gradient-cyan">ENFOCAR</span> MIENTRAS VIVO<br/>
+                    Y <span class="text-gradient-gold">VIVIR</span> MIENTRAS ENFOCO.”
+                  </h2>
+                </div>
+              </div>
+            `
+          },
+          {
+            category: "25 • Cierre y Contactos",
+            title: "¡Gracias! — Isaías Eufrosino Rodrigues",
+            render: () => `
+              <div class="max-w-4xl w-full text-center flex flex-col items-center gap-7">
+                <div class="animate-stagger delay-1 flex flex-col items-center">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-slate-950 shadow-lg">
+                      ${lupaIconSVG("w-6 h-6")}
+                    </div>
+                    <span class="font-display text-2xl font-black tracking-wider text-white">CRIA<span class="text-cyan-400">FOCO</span></span>
+                  </div>
+                  <h2 class="font-display text-5xl sm:text-7xl font-black text-gradient-cyan">¡GRACIAS !!!</h2>
+                  <p class="text-lg sm:text-2xl text-white mt-2 font-bold">Isaías Eufrosino Rodrigues</p>
+                </div>
+
+                <div class="animate-stagger delay-2 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+                  <button onclick="copyText('+55 (31) 99974-0012', 'phone')" class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                    <span class="text-xs uppercase tracking-widest text-cyan-400 font-bold">WhatsApp / Teléfono</span>
+                    <span class="text-sm sm:text-base font-bold text-white">+55 (31) 99974-0012</span>
+                    <span class="text-[11px] text-slate-400">Haz clic para copiar</span>
+                  </button>
+
+                  <button onclick="copyText('isaias.rodrigues@criafoco.com.br', 'email')" class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                    <span class="text-xs uppercase tracking-widest text-cyan-400 font-bold">Correo Electrónico</span>
+                    <span class="text-sm font-bold text-white break-all">isaias.rodrigues@criafoco.com.br</span>
+                    <span class="text-[11px] text-slate-400">Haz clic para copiar</span>
+                  </button>
+
+                  <a href="https://www.criafoco.com.br" target="_blank" rel="noopener noreferrer" class="glass-card p-5 rounded-2xl flex flex-col items-center justify-center gap-2 text-center cursor-pointer">
+                    <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">Portal Oficial</span>
+                    <span class="text-sm sm:text-base font-bold text-white">WWW.CRIAFOCO.COM.BR</span>
+                    <span class="text-[11px] text-cyan-300">Visitar sitio ↗</span>
+                  </a>
+                </div>
+              </div>
+            `
+          }
+        ]
+      }
+    };
+
+    // =========================================================================
+    // 2. PRESENTATION STATE & NAVIGATION LOGIC
+    // =========================================================================
+    let currentLang = 'pt';
+    let currentSlide = 0;
+    let isOverviewOpen = false;
+
+    const stageEl = document.getElementById('stage');
+    const categoryEl = document.getElementById('slide-category');
+    const counterEl = document.getElementById('slide-counter');
+    const progressEl = document.getElementById('progress-bar');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const navHintEl = document.getElementById('nav-hint');
+
+    function renderSlide() {
+      const langData = translations[currentLang];
+      const total = langData.slides.length;
+      const slideObj = langData.slides[currentSlide];
+
+      // Update stage HTML
+      stageEl.innerHTML = `<div class="w-full h-full flex items-center justify-center overflow-y-auto slide-scroll py-2">${slideObj.render()}</div>`;
+
+      // Update footer metadata
+      categoryEl.textContent = slideObj.category;
+      counterEl.textContent = `${String(currentSlide + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+      progressEl.style.width = `${((currentSlide + 1) / total) * 100}%`;
+      navHintEl.textContent = langData.ui.hint;
+
+      // Update navigation buttons state
+      btnPrev.disabled = currentSlide === 0;
+      btnNext.disabled = currentSlide === total - 1;
+
+      if (isOverviewOpen) {
+        renderOverviewGrid();
+      }
+    }
+
+    function nextSlide() {
+      const total = translations[currentLang].slides.length;
+      if (currentSlide < total - 1) {
+        currentSlide++;
+        renderSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        renderSlide();
+      }
+    }
+
+    function goToSlide(index) {
+      currentSlide = index;
+      if (isOverviewOpen) toggleOverview();
+      renderSlide();
+    }
+
+    function setLanguage(lang) {
+      if (!translations[lang]) return;
+      currentLang = lang;
+
+      // Update active pill styling
+      ['pt', 'en', 'es'].forEach(code => {
+        const btn = document.getElementById(`lang-${code}`);
+        if (code === lang) {
+          btn.className = 'lang-btn px-3 py-1 rounded-full text-xs font-bold tracking-wide transition-all bg-cyan-400 text-slate-950 shadow-sm';
+        } else {
+          btn.className = 'lang-btn px-3 py-1 rounded-full text-xs font-bold tracking-wide transition-all text-slate-300 hover:text-white';
+        }
+      });
+
+      document.getElementById('overview-title').textContent = translations[lang].ui.overviewTitle;
+      document.getElementById('overview-subtitle').textContent = translations[lang].ui.overviewSub;
+
+      renderSlide();
+    }
+
+    // Overview Grid Modal
+    function toggleOverview() {
+      const modal = document.getElementById('overview-modal');
+      isOverviewOpen = !isOverviewOpen;
+      if (isOverviewOpen) {
+        renderOverviewGrid();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function renderOverviewGrid() {
+      const grid = document.getElementById('overview-grid');
+      const slides = translations[currentLang].slides;
+      grid.innerHTML = slides.map((s, idx) => `
+        <button onclick="goToSlide(${idx})" class="glass-card p-5 rounded-2xl text-left flex flex-col justify-between h-36 ${idx === currentSlide ? 'border-cyan-400 bg-cyan-500/15' : ''}">
+          <div class="flex items-center justify-between w-full">
+            <span class="font-display text-sm font-black ${idx === currentSlide ? 'text-cyan-300' : 'text-slate-400'}">${String(idx + 1).padStart(2, '0')}</span>
+            <span class="text-[10px] uppercase tracking-wider text-cyan-400/80 font-semibold">${s.category}</span>
+          </div>
+          <h3 class="font-display text-base font-bold text-white line-clamp-2 mt-2">${s.title}</h3>
+        </button>
+      `).join('');
+    }
+
+    // Fullscreen Handler
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    }
+
+    // Clipboard Helper (without alert())
+    function copyText(text, type) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        const msg = type === 'email'
+          ? translations[currentLang].ui.copiedEmail
+          : translations[currentLang].ui.copiedPhone;
+        showToast(msg);
+      } catch (err) {
+        showToast(text);
+      }
+      document.body.removeChild(textarea);
+    }
+
+    let toastTimer;
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      toastMsg.textContent = message;
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 2800);
+    }
+
+    // Keyboard & Touch Navigation
+    document.addEventListener('keydown', (e) => {
+      if (isOverviewOpen && e.key === 'Escape') {
+        toggleOverview();
+        return;
+      }
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      }
+    });
+
+    // Touch Swipe Support for Mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+    document.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 55) {
+        if (diff > 0) nextSlide();
+        else prevSlide();
+      }
+    }, { passive: true });
+
+    // =========================================================================
+    // 3. ANIMATED TECH CANVAS BACKGROUND (NEURAL NETWORK + FLOWING WAVES)
+    // =========================================================================
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, particles = [];
+    let mouse = { x: null, y: null };
+    let tick = 0;
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initParticles();
+    }
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.45;
+        this.vy = (Math.random() - 0.5) * 0.45;
+        this.radius = Math.random() * 1.8 + 0.7;
+        this.hue = Math.random() > 0.3 ? 190 : 255; // Cyan or Violet
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${this.hue}, 95%, 65%, 0.75)`;
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = Math.min(Math.floor((width * height) / 14000), 95);
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    function drawWaves() {
+      for (let w = 0; w < 3; w++) {
+        ctx.beginPath();
+        const amplitude = 35 + w * 18;
+        const frequency = 0.0022 - w * 0.0004;
+        const yOffset = height * (0.35 + w * 0.16);
+        ctx.moveTo(0, yOffset);
+
+        for (let x = 0; x <= width; x += 20) {
+          const y = yOffset + Math.sin(x * frequency + tick * (0.012 + w * 0.004) + w) * amplitude;
+          ctx.lineTo(x, y);
+        }
+
+        ctx.strokeStyle = w === 1
+          ? 'rgba(0, 240, 255, 0.09)'
+          : 'rgba(124, 58, 237, 0.08)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+    }
+
+    function animateBg() {
+      tick++;
+      // Deep tech gradient background
+      const grad = ctx.createLinearGradient(0, 0, width, height);
+      grad.addColorStop(0, '#040711');
+      grad.addColorStop(0.5, '#09122b');
+      grad.addColorStop(1, '#060a1c');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Subtle glowing orbs
+      const orbX = width * 0.5 + Math.cos(tick * 0.005) * (width * 0.22);
+      const orbY = height * 0.45 + Math.sin(tick * 0.007) * (height * 0.15);
+      const orbGrad = ctx.createRadialGradient(orbX, orbY, 10, orbX, orbY, Math.max(width, height) * 0.45);
+      orbGrad.addColorStop(0, 'rgba(0, 240, 255, 0.09)');
+      orbGrad.addColorStop(0.5, 'rgba(59, 130, 246, 0.04)');
+      orbGrad.addColorStop(1, 'rgba(5, 8, 20, 0)');
+      ctx.fillStyle = orbGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      drawWaves();
+
+      // Update & connect particles
+      const maxDist = 145;
+      for (let i = 0; i < particles.length; i++) {
+        const p1 = particles[i];
+        p1.update();
+        p1.draw();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < maxDist) {
+            const alpha = (1 - dist / maxDist) * 0.22;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+
+        // Subtle mouse interaction
+        if (mouse.x !== null && mouse.y !== null) {
+          const mdx = p1.x - mouse.x;
+          const mdy = p1.y - mouse.y;
+          const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
+          if (mDist < 170) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = `rgba(0, 240, 255, ${(1 - mDist / 170) * 0.35})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(animateBg);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+    window.addEventListener('mouseleave', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+
+    window.onload = function () {
+      resizeCanvas();
+      animateBg();
+      renderSlide();
+    };
+  </script>
+</body>
+</html>
